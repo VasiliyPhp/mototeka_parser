@@ -54,7 +54,7 @@
 				/* запись товара */
 				$res = mysqli_query($db, "insert into oc_product values(null,'$model', '', '', '', '', '', '', '',
 				1,7,'$m_image',$manufacturer_id,1,0,$price,0,0,now(),$weight,1,0,0,0,1,1,1,1,1,1,now(),now())");
-				p("$ar[3] saved");
+				p("$ar[3] saved",0);
 				$id = mysqli_insert_id($db);
 				$res = mysqli_query($db, "insert into oc_product_to_store values($id,0)");
 				$res = mysqli_query($db, "insert into oc_product_to_layout values($id,0,0)");
@@ -89,7 +89,8 @@
 				}
 				
 				$res = mysqli_query($db, "insert into oc_product_description values($id,1,'$name','".
-				mysqli_real_escape_string($db, preg_replace('~<a[^>]+>(.+)</a~Uu','$1',$ar[2]))."','','$name','$name','$name купить в интернете','$name купить в интернете')");
+				mysqli_real_escape_string($db, preg_replace('~<a[^>]+>.+</a>~Uu','',$ar[2]))."','','$name','$name','$name купить в интернете','$name купить в интернете')");
+				echo mysqli_error($db);
 				
 				foreach($imgs as $img){
 					$res = mysqli_query($db, "insert into oc_product_image values(null,$id,'$img',0,'')");
@@ -184,4 +185,4 @@
 		":"=>"", ";"=>"","—"=>"", "("=>"_", ")"=>"_", "["=>"_", "]"=>"_"
 		);
 		return strtr($str,$tr);
-	}																																													
+	}																																															
