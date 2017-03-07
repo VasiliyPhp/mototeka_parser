@@ -41,9 +41,10 @@
 				$s_name = pq($child)->find('.text')->text();
 				$image = SITE . pq($child)->find('img')->attr('src');
 				// $img = save_img($image, iconv('cp1251','utf-8',$s_name), 'категории', iconv('cp1251','utf-8',$name));
-				// $img = save_img($image, $s_name, 'категории', $name);
+				$img = save_img($image, $s_name, 'категории', $name);
 				$ar['s_cat'] = $s_name;
-				// $ar['s_cat_img'] = $img;
+				$ar['s_cat_img'] = $img;
+				continue;
 				parse_good_list($link, $ar);
 				
 			}
@@ -69,7 +70,7 @@
 		
 		foreach($tmp as $g_l){
 			$good_link = SITE . pq($g_l)->attr('href');
-			phpQuery::newDocument(curl($good_link));
+			$doc2 = phpQuery::newDocument(curl($good_link));
 			
 			$ar['desc'] = iconv('cp1251','utf-8', trim(pq('.description')->html()));
 			$ar['name'] = (trim(pq('.body_text>h1')->text()));
@@ -93,20 +94,22 @@
 				$_prop[trim(pq('.name',$prop)->text())] = (pq('.val',$prop)->text());
 			}
 			$ar['props'] = serialize($_prop);
-			$ar['price'] = trim(pq('.catalog-detail-price [itemprop=price]')->text());
+			$ar['price'] = trim(pq('.catalog-detail-price [itemprop=price]')->attr('content'));
 			save_csv($ar);
 			// p($ar);
+			$doc2->unloadDocument();
 		}
 		if(count($next_page = pq('.pagination_ms .active',$doc)->next()->not('.last'))){
 			$next_page = SITE . pq('a', $next_page)->attr('href');
-			// p('next - ' . $next_page, 0);
+			$doc->unloadDocument();
+			
 			parse_good_list($next_page, $ar);
 		}
 		else{
 			p('нет следущей ссылки',0);
+			$doc->unloadDocument();
 		}
 		
-		$doc->unloadDocument();
 		
 	}
 	
@@ -212,4 +215,4 @@
 		":"=>"", ";"=>"","—"=>"", "–"=>"-"
 		);
 		return strtr($str,$tr);
-	}																																																			
+	}																																																					
